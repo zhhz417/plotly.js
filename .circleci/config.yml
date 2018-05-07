@@ -80,7 +80,7 @@ jobs:
 
   test-image:
     docker:
-      - image: quay.io/plotly/image-exporter:single-entry
+      - image: quay.io/plotly/image-exporter:graphicsmagick
     working_directory: /var/www/image-exporter/plotly.js/
     steps:
       - checkout
@@ -94,7 +94,7 @@ jobs:
 
   test-image2:
     docker:
-      - image: quay.io/plotly/image-exporter:single-entry
+      - image: quay.io/plotly/image-exporter:graphicsmagick
     working_directory: /var/www/image-exporter/plotly.js/
     steps:
       - checkout
