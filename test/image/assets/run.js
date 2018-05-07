@@ -40,8 +40,8 @@ function run(mockList, input, argv, write) {
     app.on('export-error', function(info) {
         var mockName = mockList[info.itemIndex];
 
-        var msg = 'not ok ' + mockName + ' - ' + info.msg;
-        if(info.error) msg += ' ' + info.error;
+        var msg = 'not ok ' + mockName;
+        if(info.error) msg += ' - ' + info.error;
 
         console.warn(msg);
         failed.push(msg);

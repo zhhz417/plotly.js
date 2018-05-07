@@ -1,11 +1,10 @@
 var fs = require('fs');
-var PNG = require('pngjs').PNG;
-var pixelmatch = require('pixelmatch');
-var parallel = require('run-parallel');
+var gm = require('gm');
 
 var run = require('./assets/run');
 var getMockList = require('./assets/get_mock_list');
 var getImagePaths = require('./assets/get_image_paths');
+var common = require('../../tasks/util/common');
 
 var argv = require('minimist')(process.argv.slice(2), {
     'boolean': ['queue', 'help', 'debug'],
@@ -14,7 +13,7 @@ var argv = require('minimist')(process.argv.slice(2), {
         help: ['h', 'info']
     },
     'default': {
-        threshold: 0.1,
+        threshold: 0.001,
         'parallel-limit': 4
     }
 });
@@ -65,7 +64,7 @@ if(argv._.indexOf('gl2d_*') !== -1) {
     if(!argv.queue) {
         console.log('WARN: Running gl2d image tests in batch may lead to unwanted results\n');
     }
-    console.log('\nSorting gl2d mocks to avoid gl-shader conflicts');
+    console.log('Sorting gl2d mocks to avoid gl-shader conflicts');
     sortGl2dMockList(mockList);
     console.log('');
 }
@@ -77,41 +76,35 @@ run(mockList, input, argv, function write(info, done) {
     var paths = getImagePaths(mockName);
     var imgData = info.body;
 
-    if(!fs.existsSync(paths.baseline)) {
-        return done('baseline image for ' + mockName + ' does not exist');
+    if(!common.doesFileExist(paths.baseline)) {
+        return done(mockName + ': baseline image for does not exist');
     }
 
-    parallel([
-        function(cb) {
-            var img = fs.createReadStream(paths.baseline).pipe(new PNG());
-            img.on('parsed', function() { return cb(null, img); });
-            img.on('error', function(err) { return cb(err); });
-        },
-        function(cb) { (new PNG()).parse(imgData, cb); },
-        function(cb) { fs.writeFile(paths.test, imgData, cb); },
-    ], function(err, results) {
-        if(err) done(err);
-
-        var baseline = results[0];
-        var width = baseline.width;
-        var height = baseline.height;
-        var test = results[1];
-        var diff = new PNG({width: width, height: height});
-
-        var numDiffPixels = pixelmatch(
-            baseline.data, test.data, diff.data,
-            width, height,
-            {threshold: argv.threshold}
-        );
-
-        if(numDiffPixels) {
-            var diffStream = fs.createWriteStream(paths.diff).on('finish', function() {
-                done('(' + numDiffPixels + ' pixels differ with threshold ' + argv.threshold + ')');
-            });
-            diff.pack().pipe(diffStream);
-        } else {
-            done();
+    fs.writeFile(paths.test, imgData, function(err) {
+        if(err) {
+            return done(mockName + ': error during test image generation');
         }
+
+        gm.compare(paths.test, paths.baseline, {
+            file: paths.diff,
+            highlightColor: 'purple',
+            tolerance: argv.threshold
+        }, function(err, isEqual, equality) {
+            if(err) {
+                return done(mockName + ': gm compare error');
+            }
+
+            if(isEqual) {
+                fs.unlink(paths.diff, function(err) {
+                    if(err) {
+                        return done(mockName + ': unlink error');
+                    }
+                    done();
+                });
+            } else {
+                done('differs by ' + (equality / argv.threshold).toPrecision(4) + ' times the threshold');
+            }
+        });
     });
 });
 
