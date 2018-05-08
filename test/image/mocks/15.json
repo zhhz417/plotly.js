@@ -518,7 +518,7 @@
             "autorange": true
         },
         "legend": {
-            "x": 1.02,
+            "x": 1.01,
             "y": 0.5037179079816982,
             "traceorder": "reversed",
             "font": {

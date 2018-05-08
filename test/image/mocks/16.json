@@ -106,7 +106,7 @@
           },
           {
             "showarrow": false,
-            "x": 0,
+            "x": 0.001,
             "y": 0,
             "text": "meeting"
           }

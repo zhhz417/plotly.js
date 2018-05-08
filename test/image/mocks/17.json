@@ -561,7 +561,7 @@
             "name": "Fit",
             "line": {
                 "color": "rgb(0, 204, 0)",
-                "width": 4
+                "width": 3.5
             },
             "opacity": 0.55,
             "type": "scatter"
