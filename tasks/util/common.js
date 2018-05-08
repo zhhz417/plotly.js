@@ -99,7 +99,7 @@ exports.testImageWrapper = function(opts) {
 
         var baseCmd = [
             'xvfb-run --auto-servernum',
-            '--server-args \'-screen 0, 1280x1024x24\'',
+            '--server-args \'-screen 0, 1024x768x24\'',
             pathToElectron, pathToScript, args
         ].join(' ');
 
