@@ -79,7 +79,7 @@ module.exports = {
     mapboxAccessToken: 'pk.eyJ1IjoiZXRwaW5hcmQiLCJhIjoiY2luMHIzdHE0MGFxNXVubTRxczZ2YmUxaCJ9.hwWZful0U2CQxit4ItNsiQ',
     pathToCredentials: path.join(pathToBuild, 'credentials.json'),
 
-    testContainerImage: 'quay.io/plotly/image-exporter:single-entry',
+    testContainerImage: 'quay.io/plotly/image-exporter:electron2',
     testContainerName: process.env.PLOTLYJS_TEST_CONTAINER_NAME || 'orcabed',
     testContainerHome: '/var/www/image-exporter/plotly.js',
 
