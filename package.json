@@ -120,7 +120,7 @@
     "check-node-version": "^3.2.0",
     "deep-equal": "^1.0.1",
     "ecstatic": "^3.2.0",
-    "electron": "1.8.4",
+    "electron": "^2.0.2",
     "eslint": "^4.19.1",
     "falafel": "^2.0.0",
     "fs-extra": "^2.0.0",
