@@ -19,6 +19,7 @@ var Registry = require('../../registry');
 var Lib = require('../../lib');
 var prepareRegl = require('../../lib/prepare_regl');
 var AxisIDs = require('../../plots/cartesian/axis_ids');
+var findExtremes = require('../../plots/cartesian/autorange').findExtremes;
 var Color = require('../../components/color');
 
 var subTypes = require('../scatter/subtypes');
@@ -81,7 +82,6 @@ function calc(gd, trace) {
     }
 
     // create scene options and scene
-    calcColorscales(trace);
     var opts = sceneOptions(gd, subplot, trace, positions, x, y);
     var scene = sceneUpdate(gd, subplot);
 
@@ -95,6 +95,19 @@ function calc(gd, trace) {
         ppad = 2 * (opts.marker.sizeAvg || Math.max(opts.marker.size, 3));
     }
     calcAxisExpansion(gd, trace, xa, ya, x, y, ppad);
+
+    if(opts.errorX) {
+        var xext = findExtremes(xa, opts.errorX._bnds, {padded: true});
+        trace._extremes[xa._id].min = trace._extremes.x.min.concat(xext.min);
+        trace._extremes[xa._id].max = trace._extremes.x.max.concat(xext.max);
+    }
+    if(opts.errorY) {
+        var yext = findExtremes(ya, opts.errorY._bnds, {padded: true});
+        trace._extremes[ya._id].min = trace._extremes.y.min.concat(yext.min);
+        trace._extremes[ya._id].max = trace._extremes.y.max.concat(yext.max);
+    }
+
+    calcColorscales(trace);
 
     // set flags to create scene renderers
     if(opts.fill && !scene.fill2d) scene.fill2d = true;
